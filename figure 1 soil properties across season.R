@@ -40,47 +40,7 @@ microclimate_data_2024_spring_and_fall <- microclimate_data_2024_spring %>%
   bind_rows(microclimate_data_2024_fall)
 
 
-plot_2024_spring_soil_temp <- 
-  ggplot(microclimate_data_2024_spring, aes(x = as.Date(Date), y = daily_mean_soil_temp)) +
-  stat_summary(fun.data = "mean_cl_normal", geom = "line", color = "#006600", size = 1.2) + # Mean line with 95% CI
-  stat_summary(fun.data = "mean_cl_normal", geom = "ribbon", fill = "#006600", alpha = 0.2) + # 95% CI ribbon
-  labs(title = "", x = "Date", y = "Soil temperature (°C)") +
-  scale_x_date(date_breaks = "28 days", date_labels = "%m/%d") +
-  theme_classic(base_size = 10, base_family = "sans") +
-  theme(
-    plot.title = element_text(size = 10, face = "bold", hjust = 0.5),
-    axis.title = element_text(size = 10),
-    axis.title.x = element_text(size = 12),
-    axis.title.y = element_text(size = 12),
-    axis.text.x = element_text(size = 12),
-    axis.text.y = element_text(size = 12),
-    legend.position = "none"
-  ) +
-  scale_y_continuous(limits = c(23, 36)) +
-  annotate("text", x = as.Date("2024-04-11"), y = 36,  # Outside the x and y scales
-           label = paste("2024 Spring"), 
-           hjust = 0, vjust = 0, size = 4, color = "#006600")
 
-plot_2024_fall_soil_temp <- 
-  ggplot(microclimate_data_2024_fall, aes(x = as.Date(Date), y = daily_mean_soil_temp)) +
-  stat_summary(fun.data = "mean_cl_normal", geom = "line", color =  "#867052", size = 1.0) + # Mean line with 95% CI
-  stat_summary(fun.data = "mean_cl_normal", geom = "ribbon", fill =  "#867052", alpha = 0.2) + # 95% CI ribbon
-  labs(title = "", x = "Date", y = "Soil temperature (°C)") +
-  scale_x_date(date_breaks = "28 days", date_labels = "%m/%d") +
-  theme_classic(base_size = 10, base_family = "sans") +
-  theme(
-    plot.title = element_text(size = 10, face = "bold", hjust = 0.5),
-    axis.title = element_text(size = 10),
-    axis.title.x = element_text(size = 12),
-    axis.title.y = element_text(size = 12),
-    axis.text.x = element_text(size = 12),
-    axis.text.y = element_text(size = 12),
-    legend.position = "none"
-  ) +
-  scale_y_continuous(limits = c(23, 36)) +
-  annotate("text", x = as.Date("2024-08-15"), y = 36,  # Outside the x and y scales
-           label = paste("2024 Fall"), 
-           hjust = 0, vjust = 0, size = 4, color = "#867052")
 
 plot_2024_spring_soil_moisture <- 
   ggplot(microclimate_data_2024_spring, aes(x = as.Date(Date), y = daily_mean_soil_moisture)) +
@@ -174,32 +134,7 @@ plot_2024_soil_conductivity<-plot_grid(plot_2024_spring_soil_conductivity, plot_
 microclimate_data_2024_spring_and_fall$`growing season` <- factor(microclimate_data_2024_spring_and_fall$`growing season`,
                                                                      levels = c("2024 spring","2024 fall"))
 
-box_plot_soil_temp <-
-  ggplot(microclimate_data_2024_spring_and_fall, aes(x = `growing season`, y = daily_mean_soil_temp)) +
-  geom_boxplot(aes(color = `growing season`), size = 0.8) +
-  geom_signif(comparisons = list(c("2024 spring", "2024 fall")),
-              map_signif_level = TRUE) +
-  labs(title = "",
-       x = "",
-       y = "Soil temperature (°C)") +
-  theme(
-    plot.title = element_text(size = 10, face = "bold", hjust = 0.5),
-    axis.title = element_text(size = 10),
-    axis.title.x = element_text(size = 12),
-    axis.title.y = element_text(size = 12),
-    axis.text.x = element_text(size = 12),
-    axis.text.y = element_text(size = 12),
-    legend.position = "none",
-    legend.key.size = unit(10, "points"),
-    legend.title = element_blank(),
-    legend.text = element_text(size = 10),
-    
-    # Background and gridlines
-    panel.background = element_rect(fill = "white"),
-    panel.grid.major = element_blank(),
-    panel.grid.minor = element_blank(), # Remove minor gridlines
-    axis.line = element_line(color = "black", size = 0.5)
-  )+ scale_color_manual(values = c("2024 spring" = "#006600", "2024 fall" = "#867052"))
+
 
 box_plot_soil_moisture <-
   ggplot(microclimate_data_2024_spring_and_fall, aes(x = `growing season`, y = daily_mean_soil_moisture)) +
@@ -256,56 +191,6 @@ box_plot_soil_conductivity <-
   )+ scale_color_manual(values = c("2024 spring" = "#006600", "2024 fall" = "#867052"))
 
 
-plot_soil_moisture <- 
-  ggarrange(
-    plot_2024_soil_moisture,
-    box_plot_soil_moisture,
-  ncol = 2,
-  nrow = 1,
-  widths = c(2.8, 1),
-  heights = c(1, 1),# Adjust height proportions
-  labels = c("A", "B")
-)
-
-plot_soil_conductivity <- 
-  ggarrange(
-    plot_2024_soil_conductivity,
-    box_plot_soil_conductivity,
-    ncol = 2,
-    nrow = 1,
-    widths = c(2.8, 1),
-    heights = c(1, 1),# Adjust height proportions
-    labels = c("C", "D")
-  )
-
-plot_soil_moisture_and_conductivity <- 
-  ggarrange(
-    plot_soil_moisture,
-    plot_soil_conductivity,
-    ncol = 1,
-    nrow = 2,
-    widths = c(1, 1),
-    heights = c(1, 1)
-  )
-
-ggsave("plot_soil_moisture_and_conductivity_new.png", plot = plot_soil_moisture_and_conductivity, width = 24, height = 20, units = "cm", dpi = 300)+
-  theme(plot.margin = margin(1, 1, 1, 1, "cm"))
-
-
-plot_soil_temp <- 
-  ggarrange(
-    plot_2024_soil_temp,
-    box_plot_soil_temp,
-    ncol = 2,
-    nrow = 1,
-    widths = c(2.8, 1),
-    heights = c(1, 1),# Adjust height proportions
-    labels = c("A", "B")
-  )
-
-
-ggsave("plot_soil_temp.png", plot = plot_soil_temp, width = 24, height = 10, units = "cm", dpi = 300)+
-  theme(plot.margin = margin(1, 1, 1, 1, "cm"))
 
 #figure 2
 
@@ -1074,3 +959,4 @@ plot_soil_temp_and_air_temp<-
 #
 ggsave("plot_soil_temp_and_air_temp_new.png", plot = plot_soil_temp_and_air_temp, width = 24, height = 16, 
        units = "cm", dpi = 300)
+
